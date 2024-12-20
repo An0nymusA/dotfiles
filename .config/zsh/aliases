@@ -1,0 +1,14 @@
+alias 'cd..'='cd ..'
+alias '..'='cd ..'
+
+alias d='dirs -v'
+for index ({1..9}) alias "$index"="cd +${index}"; unset index
+
+alias wezterm='flatpak run org.wezfurlong.wezterm'
+alias fd='fdfind'
+
+alias 'ls'='ls --color=always'
+alias 'mc'='yazi'
+
+alias 'py'='python3'
+alias 'python'='python3'
