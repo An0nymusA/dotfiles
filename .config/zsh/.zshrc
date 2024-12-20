@@ -16,11 +16,6 @@ setopt hist_ignore_dups
 setopt hist_find_no_dups
 
 # Plugins
-#fpath=($ZDOTDIR/plugins/zsh-completions/src $fpath)
-# source $ZDOTDIR/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source $ZDOTDIR/plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-# source $ZDOTDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
@@ -38,17 +33,10 @@ zstyle ':completion:*' list-max-items 20
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':completion:*' fzf-tab continuous-trigger '/'
 
-# zstyle ':fzf-tab:*' fzf-flags "$FZF_FLAGS"
-
-# zstyle ':completion:*' menu no
-# zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
-# zstyle ':fzf-tab:complete:__zoxide_z:*' fzf-preview 'ls --color $realpath'
-
 source $ZDOTDIR/bindings
 source $ZDOTDIR/aliases
 
 eval "$(fzf --zsh)"
-# eval "$(zoxide init --cmd cd zsh)"
 
 enable-fzf-tab
 
