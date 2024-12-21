@@ -36,21 +36,18 @@ install_fzf() {
 }
 
 install() {
-  # YADM
-  [[ "$(command -v yadm)" ]] || sudo apt install -y yadm && echo "YADM installed" || echo "YADM already installed"
-
   # Stow
   [[ "$(command -v stow)" ]] || sudo apt install -y stow && echo "Stow installed" || echo "Stow already installed"
 
   # FZF
   [[ "$(command -v fzf)" ]] || install_fzf && echo "FZF installed" || echo "FZF already installed"
-
   # ZSH
   [[ "$(command -v zsh)" ]] || sudo apt install -y zsh && echo "ZSH installed" || echo "ZSH already installed"
+  # Starship
+  [[ "$(command -v starship)" ]] || curl -sS https://starship.rs/install.sh | sh && echo "Starship installed" || echo "Starship already installed"
 
   # Bun
   [[ "$(command -v bun)" ]] || curl -fsSL https://bun.sh/install | bash && echo "Bun installed" || echo "Bun already installed"
-
   # Node.js using NVM
   if ! [ -x "$(command -v nvm)" ]; then
     echo "Installing NVM..."
