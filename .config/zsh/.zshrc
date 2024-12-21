@@ -36,7 +36,7 @@ zstyle ':completion:*' fzf-tab continuous-trigger '/'
 source $ZDOTDIR/bindings
 source $ZDOTDIR/aliases
 
-eval "$(fzf --zsh)"
+source <(fzf --zsh)
 
 enable-fzf-tab
 

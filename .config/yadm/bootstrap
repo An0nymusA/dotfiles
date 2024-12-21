@@ -1,0 +1,69 @@
+#!/bin/bash
+
+require_non_sudo() {
+  if [[ "$EUID" -eq 0 && ! " $* " =~ " --root " ]]; then
+    echo "This script must be run without sudo unless --root is specified. Please try again..."
+    exit 1
+  fi
+}
+
+install_fzf() {
+  echo "Fetching the latest release information..."
+  latest_release=$(curl -s https://api.github.com/repos/junegunn/fzf/releases/latest)
+
+  download_url=$(echo "$latest_release" | grep -oP '"browser_download_url":\s*"\K.*?fzf-\d+\.\d+\.\d+-linux_amd64\.tar\.gz(?=")')
+
+  if [[ -z "$download_url" ]]; then
+    echo "Error: Unable to fetch the download URL."
+    exit 1
+  fi
+
+  echo "Latest version download URL: $download_url"
+
+  echo "Downloading the latest fzf release..."
+  curl -LO "$download_url"
+
+  echo "Extracting fzf..."
+  tar -xzf "$(basename "$download_url")"
+
+  chmod +x fzf
+  echo "Moving fzf to /usr/local/bin..."
+  sudo mv fzf /usr/local/bin/
+
+  rm "$(basename "$download_url")"
+
+  echo "fzf installed successfully!"
+}
+
+install() {
+  # YADM
+  [[ "$(command -v yadm)" ]] || sudo apt install -y yadm && echo "YADM installed" || echo "YADM already installed"
+
+  # Stow
+  [[ "$(command -v stow)" ]] || sudo apt install -y stow && echo "Stow installed" || echo "Stow already installed"
+
+  # FZF
+  [[ "$(command -v fzf)" ]] || install_fzf && echo "FZF installed" || echo "FZF already installed"
+
+  # ZSH
+  [[ "$(command -v zsh)" ]] || sudo apt install -y zsh && echo "ZSH installed" || echo "ZSH already installed"
+
+  # Bun
+  [[ "$(command -v bun)" ]] || curl -fsSL https://bun.sh/install | bash && echo "Bun installed" || echo "Bun already installed"
+
+  # Node.js using NVM
+  if ! [ -x "$(command -v nvm)" ]; then
+    echo "Installing NVM..."
+    export NVM_DIR="$HOME/.nvm" && (
+      git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+      cd "$NVM_DIR"
+      git checkout $(git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))
+    ) && \. "$NVM_DIR/nvm.sh"
+  else
+    echo "NVM already installed"
+  fi
+}
+
+require_non_sudo "$@"
+install
+reset

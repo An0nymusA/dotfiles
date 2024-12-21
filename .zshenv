@@ -9,9 +9,9 @@ export VISUAL="nano"
 
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
-export HISTFILE="$ZDOTDIR/.zhistory"    # History filepath
-export HISTSIZE=10000                   # Maximum events for internal history
-export SAVEHIST=10000                   # Maximum events in history file
+export HISTFILE="$ZDOTDIR/.zhistory" # History filepath
+export HISTSIZE=10000                # Maximum events for internal history
+export SAVEHIST=10000                # Maximum events in history file
 
 export FZF_COMPLETION_TRIGGER='\\'
 export FZF_OPTIONS='--follow --hidden --exclude .git --exclude .cache --exclude .var --exclude node_modules --color=always'
@@ -35,12 +35,10 @@ _fzf_compgen_dir() {
 }
 . "$HOME/.cargo/env"
 
-export PATH=/home/adam/Applications/doxygen-1.12.0/bin:$PATH
-
 # Bun
-export BUN_INSTALL="$HOME/.bun" 
+export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Nvm
-export NVM_DIR="$HOME/.config/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
