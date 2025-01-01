@@ -13,7 +13,7 @@ install_vscode(){
 flatpak install flathub io.github.zen_browser.zen
 
 # Spotify
-# flatpak install flathub com.spotify.Client
+snap install spotify
 
 # Visual Studio Code
 if ! [ -x "$(command -v code)" ]; then
