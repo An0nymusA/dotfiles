@@ -39,8 +39,3 @@ source $ZDOTDIR/aliases
 source <(fzf --zsh)
 
 enable-fzf-tab
-
-# bun completions
-[ -s "/home/adam/.bun/_bun" ] && source "/home/adam/.bun/_bun"
-
-. "$HOME/.config/local/share/../bin/env"
