@@ -8,6 +8,12 @@ require_non_sudo() {
 }
 
 install_fzf() {
+
+  if [[ "$(command -v fzf)" ]]; then
+    echo "FZF already installed"
+    return
+  fi
+
   echo "Fetching the latest release information..."
   latest_release=$(curl -s https://api.github.com/repos/junegunn/fzf/releases/latest)
 
@@ -32,32 +38,101 @@ install_fzf() {
 
   rm "$(basename "$download_url")"
 
-  echo "fzf installed successfully!"
+  echo "FZF installed"
+}
+
+install_nvm() {
+  if [[ "$(command -v nvm)" ]]; then
+    echo "NVM already installed"
+    return
+  fi
+
+  echo "Installing NVM..."
+  export NVM_DIR="$HOME/.nvm" && (
+    git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
+    cd "$NVM_DIR"
+    git checkout $(git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))
+  ) && \. "$NVM_DIR/nvm.sh"
+
+  echo "NVM installed"
+}
+
+install_yazi() {
+  if [[ "$(command -v yazi)" ]]; then
+    echo "Yazi already installed"
+    return
+  fi
+
+  # Install Yazi
+  echo "Fetching the latest yazi archive..."
+  curl -L -o yazi.zip https://github.com/sxyazi/yazi/releases/latest/download/yazi-x86_64-unknown-linux-gnu.zip
+  echo "Extracting and moving yazi binaries..."
+  unzip -q yazi.zip -d yazi-temp
+  chmod +x yazi-temp/*/yazi
+  sudo mv yazi-temp/*/yazi /usr/local/bin
+  echo "Cleaning up..."
+  rm -rf yazi-temp yazi.zip
+
+  # Install dependencies
+  install_fzf
+  sudo apt install ffmpeg 7zip jq poppler-utils fd-find ripgrep zoxide imagemagick
+
+  echo "Yazi installed"
 }
 
 install() {
-  # Stow
-  [[ "$(command -v stow)" ]] || sudo apt install -y stow && echo "Stow installed" || echo "Stow already installed"
 
-  # FZF
-  [[ "$(command -v fzf)" ]] || install_fzf && echo "FZF installed" || echo "FZF already installed"
-  # ZSH
-  [[ "$(command -v zsh)" ]] || sudo apt install -y zsh && echo "ZSH installed" || echo "ZSH already installed"
-  # Starship
-  [[ "$(command -v starship)" ]] || curl -sS https://starship.rs/install.sh | sh && echo "Starship installed" || echo "Starship already installed"
+  sudo apt install unzip curl git snap -y
 
-  # Bun
-  [[ "$(command -v bun)" ]] || curl -fsSL https://bun.sh/install | bash && echo "Bun installed" || echo "Bun already installed"
-  # Node.js using NVM
-  if ! [ -x "$(command -v nvm)" ]; then
-    echo "Installing NVM..."
-    export NVM_DIR="$HOME/.nvm" && (
-      git clone https://github.com/nvm-sh/nvm.git "$NVM_DIR"
-      cd "$NVM_DIR"
-      git checkout $(git describe --abbrev=0 --tags --match "v[0-9]*" $(git rev-list --tags --max-count=1))
-    ) && \. "$NVM_DIR/nvm.sh"
-  else
-    echo "NVM already installed"
+  # Define the whiptail menu
+  CHOICES=$(whiptail --title "Software Installer" --checklist \
+  "Select the software to install:" 20 60 6 \
+  "stow" "Install GNU Stow" OFF \
+  "zsh" "Install ZSH, FZF, and Starship" OFF \
+  "yazi" "Install Yazi and dependencies" OFF \
+  "nvm" "Install Node Version Manager (NVM)" OFF \
+  "pnpm" "Install PNPM" OFF \
+  "bun" "Install Bun" OFF 3>&1 1>&2 2>&3)
+
+  # Check if the user pressed Cancel
+  if [ $? -ne 0 ]; then
+      echo "Installation canceled."
+      exit 1
+  fi
+
+  # Installing "Stow"
+  if [[ $CHOICES == *"stow"* ]]; then
+    [[ "$(command -v stow)" ]] || sudo apt install -y stow && echo "Stow installed" || echo "Stow already installed"
+  fi
+
+  # Installing "ZSH"
+  if [[ $CHOICES == *"zsh"* ]]; then
+    # FZF
+    install_fzf
+    # ZSH
+    [[ "$(command -v zsh)" ]] || sudo apt install -y zsh && chsh -s $(which zsh) && echo "ZSH installed" || echo "ZSH already installed"
+    # Starship
+    [[ "$(command -v starship)" ]] || curl -sS https://starship.rs/install.sh | sh && echo "Starship installed" || echo "Starship already installed"
+  fi
+
+  # Installing "YAZI"
+  if [[ $CHOICES == *"yazi"* ]]; then
+    install_yazi
+  fi
+
+  # Installing "NVM"
+  if [[ $CHOICES == *"nvm"* ]]; then
+    install_nvm
+  fi
+
+  # Installing "PNPM"
+  if [[ $CHOICES == *"pnpm"* ]]; then
+    [[ "$(command -v pnpm)" ]] || curl -fsSL https://get.pnpm.io/install.sh | sh - && echo "PNPM installed" || echo "PNPM already installed"
+  fi
+
+  # Installing "Bun"
+  if [[ $CHOICES == *"bun"* ]]; then
+    [[ "$(command -v bun)" ]] || curl -fsSL https://bun.sh/install | bash && echo "Bun installed" || echo "Bun already installed"
   fi
 }
 
@@ -66,4 +141,3 @@ require_non_sudo "$@"
 sudo apt update && sudo apt upgrade
 
 install
-reset

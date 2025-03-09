@@ -33,12 +33,3 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fdfind --type d --follow --hidden --exclude .git --exclude .cache --exclude .var --exclude node_modules --color=always . "$1"
 }
-. "$HOME/.cargo/env"
-
-# Bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
-# Nvm
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
